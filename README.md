@@ -1,0 +1,2 @@
+# MyFirstMurderMysteryBot
+マーダーミステリーボットを作る為のプログラムです。
