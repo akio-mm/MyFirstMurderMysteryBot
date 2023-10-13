@@ -109,13 +109,13 @@ def handle_message(event):
             return
         # １回目のChatGPTからの返信を変数answerに入れる。answerは実際にメッセージをLINEに返すときに使う変数。
         answer = answer_response["choices"][0]["message"]["content"]
-				# １回目のChatGPTからの返信から２回目の呼び出しに使う部分を取り出す
+	# １回目のChatGPTからの返信から２回目の呼び出しに使う部分を取り出す
         message = answer_response["choices"][0]["message"]
                
         # モデルがfunction-callingで関数を呼び出したいかどうかを条件分岐で確認
         if message.get("function_call"):
             function_name = message["function_call"]["name"]
-						# ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数
+	# ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数
             if function_name == "update_user_phase_investigation":
                 # ユーザーの現在のフェーズを取得
                 current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
