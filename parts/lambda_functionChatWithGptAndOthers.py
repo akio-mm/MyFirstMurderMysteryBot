@@ -108,7 +108,7 @@ def handle_message(event):
         # タイムリミットに基づく通知やフェーズの変更
         time_limit_notification = ""
         if limit == 15:
-            time_limit_notification = "もう時間も半分が過たけど原稿は見つかりそうかな？"
+            time_limit_notification = "もう時間も半分が過ぎたけど原稿は見つかりそうかな？"
         elif limit == 25:
             time_limit_notification = "あと少ししか時間は残っていない。後10分程度だ。もうすぐ家を出る準備を始めようと思うから急いでくれ。"
         elif limit == 30:
