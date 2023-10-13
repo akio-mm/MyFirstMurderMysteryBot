@@ -1,3 +1,4 @@
+# ユーザーからのメッセージを処理する
 @webhook_handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     try:
