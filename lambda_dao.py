@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 
 # ログ出力のフォーマットをカスタマイズ
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#  ログハンドラを作成し、フォーマッタを設定
+#  ログハンドラを作成し、フォーマットを設定
 ch = logging.StreamHandler()
 ch.setFormatter(formatter)
 # ロガーにハンドラを追加
