@@ -62,7 +62,7 @@ def handle_message(event):
 
         except Exception as e:
             logger.error(f"An unexpected error occurred: {e}")
-				# Logにmessagesを出力
+	　　# Logにmessagesを出力
         logger.info(messages)
         
         #ファンクションコーリングの関数を呼び出す判断をChatGPTにさせるための条件とか抜き出す単語とかを指定してる
