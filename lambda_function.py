@@ -34,7 +34,7 @@ openai.api_key = load_env_var('SECRET_KEY')
 if CHANNEL_ACCESS_TOKEN is None or CHANNEL_SECRET is None or openai.api_key is None:
     sys.exit(1)
 
-# 取得した情報をもとにLINEの操作のためのツールを変数に代入して整える
+# 取得した情報をもとにLINEの操作のためのツールを変数に代入してインスタンスにする
 line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 webhook_handler = WebhookHandler(CHANNEL_SECRET)
 
