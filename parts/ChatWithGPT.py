@@ -130,7 +130,7 @@ def handle_message(event):
                 else:  #なんか無理やり違うフェーズなのに呼び出そうとしてエラー起こすから軌道修正
                     second_response = call_second_gpt(messages)
                     answer = second_response["choices"][0]["message"]["content"]
-									
+					
             # ユーザーが特定の場所を調査したい場合呼ぶ関数
             elif function_name == "want_survey_location":
                 # ユーザーの現在のフェーズを取得
