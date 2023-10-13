@@ -17,7 +17,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-#環境変数を読み込んで中身がなかったらエラー
+# 環境変数を読み込んで中身がなかったらエラー
 def load_env_var(var_name):
     value = os.getenv(var_name)
     if value is None:
@@ -25,15 +25,15 @@ def load_env_var(var_name):
         return None
     return value
 
-#環境変数からそれぞれを取得
+# 環境変数からMessagingAPIとOpenAIの環境変数をそれぞれを取得
 CHANNEL_ACCESS_TOKEN = load_env_var('CHANNEL_ACCESS_TOKEN')
 CHANNEL_SECRET = load_env_var('CHANNEL_SECRET')
 openai.api_key = load_env_var('SECRET_KEY')
 
-#どれかが無かったら強制終了
+# どれかが無かったら強制終了
 if CHANNEL_ACCESS_TOKEN is None or CHANNEL_SECRET is None or openai.api_key is None:
     sys.exit(1)
-
+# 取得した情報をもとにLINEの操作のためのツールを変数に代入して整える
 line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 webhook_handler = WebhookHandler(CHANNEL_SECRET)
 
