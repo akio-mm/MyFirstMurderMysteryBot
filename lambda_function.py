@@ -196,6 +196,7 @@ def handle_message(event):
                 ]
         except Exception as e:
             logger.error(f"An unexpected error occurred: {e}")
+		# Logにmessagesを出力
         logger.info(messages)
         
         # ファンクションコーリングの関数を呼び出す判断をChatGPTにさせるための条件とか抜き出す単語とかを指定してる
@@ -236,12 +237,13 @@ def handle_message(event):
             answer_response = call_gpt_reasoning(messages, functions)
         else:
             answer_response = call_gpt(messages, functions)
-            
+        # answer_responseの中身が無かったらエラーを吐く
         if answer_response is None:
             logger.error("Failed to get a response from GPT.")
             return
-            
+        # １回目のChatGPTからの返信を変数answerに入れる。answerは実際にメッセージをLINEに返すときに使う変数。
         answer = answer_response["choices"][0]["message"]["content"]
+		# １回目のChatGPTからの返信から２回目の呼び出しに使う部分を取り出す
         message = answer_response["choices"][0]["message"]
         
         # 受け取った回答のJSONを目視確認できるようにINFOでログに吐く
@@ -255,13 +257,7 @@ def handle_message(event):
         # モデルが関数を呼び出したいかどうかを確認
         if message.get("function_call"):
             function_name = message["function_call"]["name"]
-            # エラーが起こってるので入れたエラーハンドリング。ChatGPTからの返信がおかしい。
-            try:
-                arguments = json.loads(message["function_call"]["arguments"])
-            except json.JSONDecodeError:
-                logger.error("Invalid JSON format in arguments.")
-                logger.error(f"Invalid arguments content: {message['function_call']['arguments']}")
-                
+  			# ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数              
             if function_name == "update_user_phase_investigation":
                 # ユーザーの現在のフェーズを取得
                 current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
@@ -275,7 +271,8 @@ def handle_message(event):
                 else:  # なんか無理やり違うフェーズなのに呼び出そうとしてエラー起こすから軌道修正
                     second_response = call_second_gpt(messages)
                     answer = second_response["choices"][0]["message"]["content"]
-                
+					
+            # ユーザーが特定の場所を調査したい場合呼ぶ関数
             elif function_name == "want_survey_location":
                 # ユーザーの現在のフェーズを取得
                 current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
