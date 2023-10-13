@@ -11,7 +11,7 @@ def handle_message(event):
         # ユーザーからのメッセージ
         query = event.message.text
         
-        # user情報を取得
+        # ユーザー情報を取得
         get_user = lambda_dao.get_user_info(user_id)
         
         # ユーザー情報がない場合新しく作成
