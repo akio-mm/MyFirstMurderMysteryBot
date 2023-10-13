@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 
 # ログ出力のフォーマットをカスタマイズ
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# ログハンドラを作成し、フォーマッタを設定
+#  ログハンドラを作成し、フォーマッタを設定
 ch = logging.StreamHandler()
 ch.setFormatter(formatter)
 # ロガーにハンドラを追加
@@ -80,7 +80,7 @@ def increment_limit(user_id):
         
         
 
-#フェイズに応じたプロンプトを取得
+# フェイズに応じたプロンプトを取得
 @handle_dynamodb_exception('Failed to get prompt for phase', 'Phase parameter: {phase}')
 def get_prompt_for_phase(current_phase):
     # DynamoDB クライアントを初期化（この部分は環境に依存）
@@ -140,7 +140,7 @@ def update_user_phase(user_id, current_phase):
         # このエラーメッセージはhandle_dynamodb_exceptionによってログに記録されます。
         return None
 
-#終了するための関数
+# 終了するための関数
 @handle_dynamodb_exception('update user phase', "user_id: {user_id}, current_phase: {current_phase}, next_phase: {next_phase}")
 def update_user_phase_end(user_id):
     next_phase = "end"
