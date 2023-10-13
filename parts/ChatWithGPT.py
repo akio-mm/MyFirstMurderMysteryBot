@@ -4,7 +4,6 @@ import openai
 import os
 import sys
 import boto3
-import lambda_dao
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
