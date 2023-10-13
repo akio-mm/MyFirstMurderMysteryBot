@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 
 # ログ出力のフォーマットをカスタマイズ
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#  ログハンドラを作成し、フォーマットを設定
+# ログハンドラを作成し、フォーマットを設定
 ch = logging.StreamHandler()
 ch.setFormatter(formatter)
 # ロガーにハンドラを追加
@@ -80,7 +80,7 @@ def increment_limit(user_id):
         
         
 
-# フェイズに応じたプロンプトを取得
+# フェーズに応じたプロンプトを取得
 @handle_dynamodb_exception('Failed to get prompt for phase', 'Phase parameter: {phase}')
 def get_prompt_for_phase(current_phase):
     # DynamoDB クライアントを初期化（この部分は環境に依存）
@@ -189,7 +189,7 @@ def put_talk_history(item):
     return talk_history.put_item(Item=item)
 
 # ユーザー情報を更新する
-@handle_dynamodb_exception('update user info', 'user_id and argsment parameters. user_id should be a string and argsment should be a dictionary containing update parameters.')
+@handle_dynamodb_exception('update user info', 'user_id and argument parameters. user_id should be a string and argsment should be a dictionary containing update parameters.')
 def update_user_info(user_id, argsment):
     update_expression, expression_attribute_values = get_update_params(argsment)
     return user_table.update_item(
