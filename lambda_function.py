@@ -401,7 +401,7 @@ def call_gpt_reasoning(messages, functions):
 #Urlをまとめたデータを作成
 url_mapping = {
     '正解': 'https://example.com/page2',
-    '不正解': 'https://example.com/page3',
+    '不正解': 'https://example.com/page4',
     'リビング': 'https://example.com/page3',
     '書斎': 'https://example.com/page3',
     'キッチン': 'https://example.com/page3',
