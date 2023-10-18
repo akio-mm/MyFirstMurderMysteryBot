@@ -400,19 +400,19 @@ def call_gpt_reasoning(messages, functions):
 
 #Urlをまとめたデータを作成
 url_mapping = {
-    '正解': 'https://docs.google.com/document/d/1j23deV8p8PwYVdYBxhHL0id7vxjd1iwOr0GjFkTuGXw/edit?usp=sharing',
-    '不正解': 'https://docs.google.com/document/d/1Xfjb69VUMf9gz63UTd65Rk-qp5INDD_GHJ-DbxCg4eU/edit?usp=sharing',
-    'リビング': 'https://docs.google.com/document/d/15f_UX1WtwFy12CgMsHcwBBIWp0DMD8ohWu-QUDE1J4A/edit?usp=sharing',
-    '書斎': 'https://docs.google.com/document/d/1Njvoai5L34A8AJRuhgmgznDBuFgvnoWOJOs5apgH0es/edit?usp=sharing',
-    'キッチン': 'https://docs.google.com/document/d/10HO1uwx1EMOzfDpSYCmHInyryay-OekP3al7jp28fn0/edit?usp=sharing',
-    'テーブル': 'https://docs.google.com/document/d/1Vx4AZe6lUX2fsGlYImrj7Ms5p36R4w4cJXfdcnVbQfE/edit?usp=sharing',
-    'テーブルの下': 'https://docs.google.com/document/d/1zaZ61Cwcl5QsVoYlGLG0zzmfK01fyiy9FZOl0C-uhnY/edit?usp=sharing',
-    'ベランダ': 'https://docs.google.com/document/d/1wdtKf0XS7_w0XMDsLBrYtV-edDRTbblhQFtmSuj95IQ/edit?usp=sharing',
-    'ゴミ箱': 'https://docs.google.com/document/d/1S6m8qgAMDNDa_kvNh0f2HFF4OACn1Pf9c0C9hHiEpBk/edit?usp=sharing',
-    'クローゼット': 'https://docs.google.com/document/d/1zjORtkbF2XtV4EbS5_A0nu0foY7bo8Cn7APTe1E4zQ8/edit?usp=sharing',
-    '仕事机': 'https://docs.google.com/document/d/1N2CeDvdrijRYHkjhXtXqfk2KCdylYNH3-kGOhzbytvk/edit?usp=sharing',
-    '引き出し': 'https://docs.google.com/document/d/1_Qwj_RovS5grrqg-OPBxrOUI5i-PI2cg-8tqEiXEDdc/edit?usp=sharing',
-    'トイレ': 'https://docs.google.com/document/d/1tLDczy1QTuyCRpvthdSttpEQ4hcwBf0d-DtsHAJYIr4/edit?usp=sharing'
+    '正解': 'https://example.com/page2',
+    '不正解': 'https://example.com/page3',
+    'リビング': 'https://example.com/page3',
+    '書斎': 'https://example.com/page3',
+    'キッチン': 'https://example.com/page3',
+    'テーブル': 'https://example.com/page3',
+    'テーブルの下': 'https://example.com/page3',
+    'ベランダ': 'https://example.com/page3',
+    'ゴミ箱': 'https://example.com/page3',
+    'クローゼット': 'https://example.com/page3',
+    '仕事机': 'https://example.com/page3',
+    '引き出し': 'https://example.com/page3',
+    'トイレ': 'https://example.com/page3'
 }
 
 #特定のキーワードをもとにUrlを取得（場所）
