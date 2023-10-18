@@ -114,13 +114,6 @@ def handle_message(event):
         if current_phase == 'end':
             # ChatGPTを使わずに特定のメッセージを送る
             return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=questionnaire))
-
-        # フェーズに応じたプロンプトを取得
-        try:
-            current_prompt = lambda_dao.get_prompt_for_phase(current_phase)
-            logger.info(current_prompt)
-        except NoPromptFoundError:
-            logger.error(f"No prompt found for the phase: {current_phase}")
         
         # 利用回数カウントアップ
         count = lambda_dao.increment_count(user_id)
@@ -159,6 +152,9 @@ def handle_message(event):
         # 過去の会話履歴を保存
         get_talk = lambda_dao.get_talk_history(user_id)
         past_conversations = get_past_conversations(get_talk)
+
+        # フェーズに応じたプロンプトを取得
+        current_prompt = lambda_dao.get_prompt_for_phase(current_phase)
         
         if current_prompt is None:
             logger.error("current_prompt is None")
