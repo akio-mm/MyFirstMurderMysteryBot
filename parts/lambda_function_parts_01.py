@@ -249,6 +249,7 @@ def handle_message(event):
         # モデルが関数を呼び出したいかどうかを確認
         if message.get("function_call"):
             function_name = message["function_call"]["name"]
+            arguments = json.loads(message["function_call"]["arguments"])
   			# ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数              
             if function_name == "update_user_phase_investigation":
                 # ユーザーの現在のフェーズを取得
