@@ -341,6 +341,20 @@ def handle_message(event):
         # その他の未知のエラー
         logger.error(f"An unexpected error occurred in handle_message: {e.args}")
 
+# 会話履歴をリスト化
+def get_past_conversations(get_talk, n=15):
+    try:
+        items = get_talk.get('Items', [])
+        result = []
+        for item in items[:n]:
+            if 'message' in item and 'reply' in item:
+                result.append({'role': 'user', 'content': item['message']})
+                result.append({'role': 'assistant', 'content': item['reply']})
+        return result
+    except Exception as e:
+        logger.error(f"Failed to get past conversations: {e}")
+        return []
+
 # gptを呼び出す
 def call_gpt(messages, functions):
     return openai.ChatCompletion.create(
@@ -408,20 +422,6 @@ def get_url_based_on_keyword_place(location_name, url_mapping):
 #特定のキーワードをもとにUrlを取得（エンディング）
 def get_url_based_on_keyword(ending, url_mapping):
     return url_mapping.get(ending)
-
-# 会話履歴をリスト化
-def get_past_conversations(get_talk, n=15):
-    try:
-        items = get_talk.get('Items', [])
-        result = []
-        for item in items[:n]:
-            if 'message' in item and 'reply' in item:
-                result.append({'role': 'user', 'content': item['message']})
-                result.append({'role': 'assistant', 'content': item['reply']})
-        return result
-    except Exception as e:
-        logger.error(f"Failed to get past conversations: {e}")
-        return []
 
 # LINE Messaging APIからのWebhookを処理する
 def lambda_handler(event, context):
