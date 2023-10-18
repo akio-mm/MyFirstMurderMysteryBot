@@ -1,5 +1,4 @@
 import json
-import logging
 import boto3
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
@@ -8,10 +7,6 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource('dynamodb')
 talk_history = dynamodb.Table('talk_history')
 user_table = dynamodb.Table('user_info')
-
-# INFOレベル以上のログメッセージを拾うように設定する
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 def handle_dynamodb_exception(action, parameters):
     def decorator(func):
