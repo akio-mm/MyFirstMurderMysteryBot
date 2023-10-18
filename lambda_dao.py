@@ -165,7 +165,7 @@ def update_user_phase_end(user_id):
 @handle_dynamodb_exception('get_user_info', 'user_id parameter')
 def get_user_info(user_id):
     response =  user_table.get_item(Key={'user_id': user_id})
-     # 'Item'キーがない場合、Noneを返す
+    # 'Item'キーがない場合、Noneを返す
     return response.get('Item', None)
 
 # 会話履歴を返す
