@@ -168,6 +168,11 @@ def get_user_info(user_id):
     # 'Item'キーがない場合、Noneを返す
     return response.get('Item', None)
 
+# 新しいユーザーを登録する
+@handle_dynamodb_exception('put_user_info', 'user_item parameter should be a dictionary containing user_id, limit, count, and CurrentPhase keys.')
+def put_user_info(item):
+    return user_table.put_item(Item=item)
+
 # 会話履歴を返す
 @handle_dynamodb_exception('get_talk_history', 'user_id and count parameters')
 def get_talk_history(user_id):
@@ -176,12 +181,6 @@ def get_talk_history(user_id):
         # 最新ｘ件を取得
         Limit = 15
     )
-
-# 新しいユーザーを登録する
-@handle_dynamodb_exception('put_user_info', 'user_item parameter should be a dictionary containing user_id, limit, count, and CurrentPhase keys.')
-def put_user_info(item):
-    return user_table.put_item(Item=item)
-
 
 # 新しい会話履歴を登録する
 @handle_dynamodb_exception('put_talk_history', 'talk_history parameter')
