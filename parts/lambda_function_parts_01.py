@@ -114,10 +114,6 @@ def handle_message(event):
         if current_phase == 'end':
             # ChatGPTを使わずに特定のメッセージを送る
             return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=questionnaire))
-
-        # フェーズに応じたプロンプトを取得
-        current_prompt = lambda_dao.get_prompt_for_phase(current_phase)
-        
         # 利用回数カウントアップ
         count = lambda_dao.increment_count(user_id)
         
