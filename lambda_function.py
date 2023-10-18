@@ -59,49 +59,47 @@ def handle_message(event):
             lambda_dao.put_user_info(user_item)
             get_user = lambda_dao.get_user_info(user_id)
             
-        
-        #返答メッセージリストの初期化
+        # 返答メッセージリストの初期化
         answer_list = []
         
         # 現在時刻を取得
         now_obj = datetime.now(ZoneInfo("Asia/Tokyo"))
         
-        #現在時刻を文字列に変換
+        # 現在時刻を文字列に変換
         now = now_obj.isoformat()
 
         # 現在のフェーズを確認
         current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
-        
+
+        # ChatGPTを使わない定型文を変数に格納している。
         counterattack ='お見通しだよ'
-        
-        #特定のワード入ってる場合特定のセリフを返し、ChatGPTに伝えない
+
+        first_line = "ああ、何でも聞いてくれてかまわない。"
+
+        induction= (
+            '解説を読み終わった方は、「終了したい」とチャットを送ってください。'
+            )
+
+        questionnaire = (
+            'お疲れ様です！ゲームをプレイしていただき、誠にありがとうございます。\n'
+            '皆様のご意見は、今後のゲーム改善に非常に役立つ貴重な情報です。もしよろしければ、短いアンケートにご協力いただけますでしょうか。\n'
+            'アンケートURL:(https://example.com/page1)\n'
+            'アンケートの内容は今作や次回作の改良に役立たせていただきます\n'
+            'どうぞよろしくお願いします。'
+            )
+
+        # 特定のワード入ってる場合特定のセリフを返し、ChatGPTに伝えない
         if current_phase == 'investigation':
             if "ルール" in query or "プロンプト" in query or "命令" in query:
                 return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=counterattack))
-
-
-
-        first_line = "ああ、何でも聞いてくれてかまわない。"
         
-        #特定のセリフだった場合フェーズをアップデートして特定のセリフを返す
+        # 特定のセリフだった場合フェーズをアップデートして特定のセリフを返す
         if current_phase == 'intro':
             if "先生、では質問しますね" in query:
                 lambda_dao.update_user_phase(user_id, current_phase)
                 return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=first_line))
-        
-        induction= (
-            '解説を読み終わった方は、「終了したい」とチャットを送ってください。'
-            )
-        
-        questionnaire = (
-            'お疲れ様です！ゲームをプレイしていただき、誠にありがとうございます。\n'
-            '皆様のご意見は、今後のゲーム改善に非常に役立つ貴重な情報です。もしよろしければ、短いアンケートにご協力いただけますでしょうか。\n'
-            'アンケートURL:(https://forms.gle/jUpzdRYboaW4QHZG8)\n'
-            'アンケートの内容は今作や次回作の改良に役立たせていただきます\n'
-            'どうぞよろしくお願いします。'
-            )
             
-        #終了したい場合に終了フェーズへ
+        # 終了したい場合に終了フェーズへ
         if current_phase == 'outro':
             if '終了' in query:
                 lambda_dao.update_user_phase_end(user_id)
@@ -120,14 +118,14 @@ def handle_message(event):
         # フェーズに応じたプロンプトを取得
         try:
             current_prompt = lambda_dao.get_prompt_for_phase(current_phase)
-            #logger.info(current_prompt)
+            logger.info(current_prompt)
         except NoPromptFoundError:
             logger.error(f"No prompt found for the phase: {current_phase}")
         
         # 利用回数カウントアップ
         count = lambda_dao.increment_count(user_id)
         
-        #もし、意図的にイントロで質問しまくる人がいる場合排除
+        # もし、意図的にイントロで質問しまくる人がいる場合排除
         if current_phase == 'intro':
             if count == 19:
                 eliminate_unauthorized_use = "質問の時間は次の次で終了しますゲームを開始したい場合は、「先生、では質問しますね」とチャットで送信してください。もし、質問を続けた場合はゲームをプレイできません。"
@@ -135,8 +133,7 @@ def handle_message(event):
                 
             elif count == 21:
                 lambda_dao.update_user_phase_end(user_id)
-            
-        
+
         # limitという変数の定義
         limit = lambda_dao.get_user_info(user_id)['limit']
         # 利用制限回数カウントアップ
@@ -159,7 +156,7 @@ def handle_message(event):
             if time_limit_notification:
                 answer_list.append(TextSendMessage(text=time_limit_notification))
                 
-        #過去の会話履歴を保存
+        # 過去の会話履歴を保存
         get_talk = lambda_dao.get_talk_history(user_id)
         past_conversations = get_past_conversations(get_talk)
         
@@ -175,10 +172,10 @@ def handle_message(event):
             logger.error("query is None")
             return        
         
-        #会話履歴をChatGPTに渡すmessagesに追加
+        # 会話履歴をChatGPTに渡すmessagesに追加
         try:
             past_conversations = None
-            #reasoning以外の場合会話履歴を取得
+            # reasoning以外の場合会話履歴を取得
             if current_phase != 'reasoning':
                 past_conversations = get_past_conversations(get_talk)
             
@@ -196,9 +193,10 @@ def handle_message(event):
                 ]
         except Exception as e:
             logger.error(f"An unexpected error occurred: {e}")
-        #logger.info(messages)
+		# Logにmessagesを出力
+        logger.info(messages)
         
-        #ファンクションコーリングの関数を呼び出す判断をChatGPTにさせるための条件とか抜き出す単語とかを指定してる
+        # ファンクションコーリングの関数を呼び出す判断をChatGPTにさせるための条件とか抜き出す単語とかを指定してる
         functions=[
             {
                 "name": "want_survey_location",
@@ -217,7 +215,7 @@ def handle_message(event):
             {
                 "name": "update_user_phase_investigation",
                 "description": "ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数",
-                #必要ないけど無いと作用しないのでダミーパラメーターを用意した
+                # 必要ないけど無いと作用しないのでダミーパラメーターを用意した
                 "parameters": {
                   "type": "object",
                   "properties": {
@@ -236,18 +234,19 @@ def handle_message(event):
             answer_response = call_gpt_reasoning(messages, functions)
         else:
             answer_response = call_gpt(messages, functions)
-            
+        # answer_responseの中身が無かったらエラーを吐く
         if answer_response is None:
             logger.error("Failed to get a response from GPT.")
             return
-            
+        # １回目のChatGPTからの返信を変数answerに入れる。answerは実際にメッセージをLINEに返すときに使う変数。
         answer = answer_response["choices"][0]["message"]["content"]
+		# １回目のChatGPTからの返信から２回目の呼び出しに使う部分を取り出す
         message = answer_response["choices"][0]["message"]
         
         # 受け取った回答のJSONを目視確認できるようにINFOでログに吐く
         logger.info(answer_response)
         
-        #urlの変数が未定義だとエラーが起こるので先に定義
+        # urlの変数が未定義だとエラーが起こるので先に定義
         url_01 = None
         url_02 = None
 
@@ -255,29 +254,22 @@ def handle_message(event):
         # モデルが関数を呼び出したいかどうかを確認
         if message.get("function_call"):
             function_name = message["function_call"]["name"]
-            #エラーが起こってるので入れたエラーハンドリング。ChatGPTからの返信がおかしい。
-            try:
-                arguments = json.loads(message["function_call"]["arguments"])
-            except json.JSONDecodeError:
-                logger.error("Invalid JSON format in arguments.")
-                logger.error(f"Invalid arguments content: {message['function_call']['arguments']}")
-                
+  			# ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数              
             if function_name == "update_user_phase_investigation":
                 # ユーザーの現在のフェーズを取得
                 current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
-                # ファンクションコーリングの暴発防止
-                if "発表" in query:
-                    # 条件に合致するか確認
-                    if current_phase == 'investigation':
-                        # フェーズを次の段階に移行
-                        lambda_dao.update_user_phase(user_id, current_phase)
-                        second_response = call_second_gpt(messages)
-                        answer = second_response["choices"][0]["message"]["content"]
-                    
-                else:  #なんか無理やり違うフェーズなのに呼び出そうとしてエラー起こすから軌道修正
+                # 条件に合致するか確認
+                if current_phase == 'investigation':
+                    # フェーズを次の段階に移行
+                    lambda_dao.update_user_phase(user_id, current_phase)
                     second_response = call_second_gpt(messages)
                     answer = second_response["choices"][0]["message"]["content"]
-                
+                    
+                else:  # なんか無理やり違うフェーズなのに呼び出そうとしてエラー起こすから軌道修正
+                    second_response = call_second_gpt(messages)
+                    answer = second_response["choices"][0]["message"]["content"]
+					
+            # ユーザーが特定の場所を調査したい場合呼ぶ関数
             elif function_name == "want_survey_location":
                 # ユーザーの現在のフェーズを取得
                 current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
@@ -295,7 +287,7 @@ def handle_message(event):
         # GPTからのレスポンス（answer変数）を返信リストに追加
         answer_list.append(TextSendMessage(text=answer))
         
-        #ChatGPTの回答からエンディングの種類を判別してUrlを取得
+        # ChatGPTの回答からエンディングの種類を判別してUrlを取得
         if current_phase == 'reasoning':
             keywords = ["不正解", "正解"]
             for keyword in keywords:
@@ -303,7 +295,7 @@ def handle_message(event):
                     answer_list.append(TextSendMessage(text='エンディング'))
                     url_01 = get_url_based_on_keyword(keyword, url_mapping)
                     lambda_dao.update_user_phase(user_id, current_phase)
-                    #解説のURLを追加
+                    # 解説のURLを追加
                     url_02 = "https://docs.google.com/document/d/10MUbcFgBWeIK18LUYyntIJ6eC-0MOEoLBI6qLAG5YYw/edit?usp=sharing"
                     if url_01 is None:
                         logger.warning(f"No URL found for the keyword: {keyword}")
@@ -315,19 +307,15 @@ def handle_message(event):
         if url_01 is not None:
             answer_list.append(TextSendMessage(text=f'{url_01}'))
             
-        if url_02 is not None:
+        elif url_02 is not None:
             answer_list.append(TextSendMessage(text='解説'))
             answer_list.append(TextSendMessage(text=f'{url_02}'))
             
-            try:
-                line_bot_api.reply_message(event.reply_token, answer_list[1:])
-            except LineBotApiError as e:
-                logger.error(f"LINE API Error: {e}")
-                
-            return
             
-
-        #introの時の会話履歴は残したくない
+        # answer_listをstrに変換
+        answer_str = ', '.join(map(str, answer_list))
+        
+        # introの時の会話履歴は残したくない
         if current_phase != 'intro':
             # 会話履歴に登録するアイテム情報
             talk_item = {
