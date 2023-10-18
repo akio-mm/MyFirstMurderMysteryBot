@@ -7,7 +7,6 @@ from boto3.dynamodb.conditions import Key, Attr
 
 # dynamodb
 dynamodb = boto3.resource('dynamodb')
-dynamodb_client = boto3.client('dynamodb')
 talk_history = dynamodb.Table('talk_history')
 user_table = dynamodb.Table('user_info')
 
