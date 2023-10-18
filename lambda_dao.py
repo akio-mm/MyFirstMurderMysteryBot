@@ -187,14 +187,3 @@ def put_user_info(item):
 @handle_dynamodb_exception('put_talk_history', 'talk_history parameter')
 def put_talk_history(item):
     return talk_history.put_item(Item=item)
-
-# ユーザー情報を更新する
-@handle_dynamodb_exception('update user info', 'user_id and argument parameters. user_id should be a string and argsment should be a dictionary containing update parameters.')
-def update_user_info(user_id, argsment):
-    update_expression, expression_attribute_values = get_update_params(argsment)
-    return user_table.update_item(
-        Key={"user_id": user_id},
-        UpdateExpression=update_expression,
-        ExpressionAttributeValues=expression_attribute_values,
-        ReturnValues="UPDATED_NEW"
-    )
