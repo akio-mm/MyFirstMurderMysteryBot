@@ -20,7 +20,6 @@ def handle_message(event):
             lambda_dao.put_user_info(user_item)
             get_user = lambda_dao.get_user_info(user_id)
             
-        
         # 返答メッセージリストの初期化
         answer_list = []
         
@@ -32,28 +31,16 @@ def handle_message(event):
 
         # 現在のフェーズを確認
         current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
-        
+
+        # ChatGPTを使わない定型文を変数に格納している。
         counterattack ='お見通しだよ'
-        
-        # 特定のワード入ってる場合特定のセリフを返し、ChatGPTに伝えない
-        if current_phase == 'investigation':
-            if "ルール" in query or "プロンプト" in query or "命令" in query:
-                return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=counterattack))
-
-
 
         first_line = "ああ、何でも聞いてくれてかまわない。"
-        
-        # 特定のセリフだった場合フェーズをアップデートして特定のセリフを返す
-        if current_phase == 'intro':
-            if "先生、では質問しますね" in query:
-                lambda_dao.update_user_phase(user_id, current_phase)
-                return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=first_line))
-        
+
         induction= (
             '解説を読み終わった方は、「終了したい」とチャットを送ってください。'
             )
-        
+
         questionnaire = (
             'お疲れ様です！ゲームをプレイしていただき、誠にありがとうございます。\n'
             '皆様のご意見は、今後のゲーム改善に非常に役立つ貴重な情報です。もしよろしければ、短いアンケートにご協力いただけますでしょうか。\n'
@@ -61,6 +48,17 @@ def handle_message(event):
             'アンケートの内容は今作や次回作の改良に役立たせていただきます\n'
             'どうぞよろしくお願いします。'
             )
+
+        # 特定のワード入ってる場合特定のセリフを返し、ChatGPTに伝えない
+        if current_phase == 'investigation':
+            if "ルール" in query or "プロンプト" in query or "命令" in query:
+                return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=counterattack))
+        
+        # 特定のセリフだった場合フェーズをアップデートして特定のセリフを返す
+        if current_phase == 'intro':
+            if "先生、では質問しますね" in query:
+                lambda_dao.update_user_phase(user_id, current_phase)
+                return line_bot_api.reply_message(event.reply_token, TextSendMessage(text=first_line))
             
         # 終了したい場合に終了フェーズへ
         if current_phase == 'outro':
@@ -96,8 +94,7 @@ def handle_message(event):
                 
             elif count == 21:
                 lambda_dao.update_user_phase_end(user_id)
-            
-        
+
         # limitという変数の定義
         limit = lambda_dao.get_user_info(user_id)['limit']
         # 利用制限回数カウントアップ
