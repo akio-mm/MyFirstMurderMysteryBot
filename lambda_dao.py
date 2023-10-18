@@ -42,6 +42,32 @@ def handle_dynamodb_exception(action, parameters):
         return wrapper
     return decorator
 
+# user情報を返す、なければNone
+@handle_dynamodb_exception('get_user_info', 'user_id parameter')
+def get_user_info(user_id):
+    response =  user_table.get_item(Key={'user_id': user_id})
+    # 'Item'キーがない場合、Noneを返す
+    return response.get('Item', None)
+
+# 新しいユーザーを登録する
+@handle_dynamodb_exception('put_user_info', 'user_item parameter should be a dictionary containing user_id, limit, count, and CurrentPhase keys.')
+def put_user_info(item):
+    return user_table.put_item(Item=item)
+
+# 会話履歴を返す
+@handle_dynamodb_exception('get_talk_history', 'user_id and count parameters')
+def get_talk_history(user_id):
+    return talk_history.query(
+        KeyConditionExpression=Key('user_id').eq(user_id),
+        # 最新ｘ件を取得
+        Limit = 15
+    )
+
+# 新しい会話履歴を登録する
+@handle_dynamodb_exception('put_talk_history', 'talk_history parameter')
+def put_talk_history(item):
+    return talk_history.put_item(Item=item)
+
 # countをインクリメント(+1)して数値を返す
 @handle_dynamodb_exception('increment_count', 'user_id, DynamoDB update operation, checking Attributes in response')
 def increment_count(user_id):
@@ -159,30 +185,3 @@ def update_user_phase_end(user_id):
     else:
         # このエラーメッセージはhandle_dynamodb_exceptionによってログに記録されます。
         return None
-
-
-# user情報を返す、なければNone
-@handle_dynamodb_exception('get_user_info', 'user_id parameter')
-def get_user_info(user_id):
-    response =  user_table.get_item(Key={'user_id': user_id})
-    # 'Item'キーがない場合、Noneを返す
-    return response.get('Item', None)
-
-# 新しいユーザーを登録する
-@handle_dynamodb_exception('put_user_info', 'user_item parameter should be a dictionary containing user_id, limit, count, and CurrentPhase keys.')
-def put_user_info(item):
-    return user_table.put_item(Item=item)
-
-# 会話履歴を返す
-@handle_dynamodb_exception('get_talk_history', 'user_id and count parameters')
-def get_talk_history(user_id):
-    return talk_history.query(
-        KeyConditionExpression=Key('user_id').eq(user_id),
-        # 最新ｘ件を取得
-        Limit = 15
-    )
-
-# 新しい会話履歴を登録する
-@handle_dynamodb_exception('put_talk_history', 'talk_history parameter')
-def put_talk_history(item):
-    return talk_history.put_item(Item=item)
