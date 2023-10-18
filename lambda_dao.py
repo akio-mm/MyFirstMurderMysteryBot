@@ -1,9 +1,8 @@
 import json
 import logging
 import boto3
-import datetime
 from botocore.exceptions import ClientError
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key
 
 # dynamodb
 dynamodb = boto3.resource('dynamodb')
