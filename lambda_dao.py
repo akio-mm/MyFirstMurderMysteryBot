@@ -13,14 +13,6 @@ user_table = dynamodb.Table('user_info')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# ログ出力のフォーマットをカスタマイズ
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# ログハンドラを作成し、フォーマットを設定
-ch = logging.StreamHandler()
-ch.setFormatter(formatter)
-# ロガーにハンドラを追加
-logger.addHandler(ch)
-
 def handle_dynamodb_exception(action, parameters):
     def decorator(func):
         def wrapper(*args, **kwargs):
