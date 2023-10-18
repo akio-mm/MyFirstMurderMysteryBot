@@ -9,10 +9,6 @@ dynamodb = boto3.resource('dynamodb')
 talk_history = dynamodb.Table('talk_history')
 user_table = dynamodb.Table('user_info')
 
-# INFOレベル以上のログメッセージを拾うように設定する
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
 def handle_dynamodb_exception(action, parameters):
     def decorator(func):
         def wrapper(*args, **kwargs):
