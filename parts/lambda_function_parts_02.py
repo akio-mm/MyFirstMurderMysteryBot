@@ -347,61 +347,6 @@ def get_past_conversations(get_talk, n=15):
         logger.error(f"Failed to get past conversations: {e}")
         return []
 
-# gptを呼び出す
-def call_gpt(messages, functions):
-    return openai.ChatCompletion.create(
-        model= 'gpt-3.5-turbo-16k-0613',
-        temperature=0.05,
-        max_tokens=100,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        messages= messages,
-        functions= functions,
-        function_call="auto"
-    )
-
-# gptを呼び出す(２回目)
-def call_second_gpt(messages):
-    return openai.ChatCompletion.create(
-        model= 'gpt-3.5-turbo-16k-0613',
-        temperature=0.05,
-        max_tokens=100,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=["\n"],
-        messages= messages
-    )
-    
-# gptを呼び出す(正解か不正解化だけが欲しいので。と！で切る)
-def call_gpt_reasoning(messages):
-    logger.info("About to call GPT-3 API.")
-    return openai.ChatCompletion.create(
-        model= 'gpt-3.5-turbo-16k-0613',
-        temperature=0.05,
-        max_tokens=100,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=["。", "！"],
-        messages= messages
-    )
-        
-# 会話履歴をリスト化
-def get_past_conversations(get_talk, n=15):
-    try:
-        items = get_talk.get('Items', [])
-        result = []
-        for item in items[:n]:
-            if 'message' in item and 'reply' in item:
-                result.append({'role': 'user', 'content': item['message']})
-                result.append({'role': 'assistant', 'content': item['reply']})
-        return result
-    except Exception as e:
-        logger.error(f"Failed to get past conversations: {e}")
-        return []
-
 # LINE Messaging APIからのWebhookを処理する
 def lambda_handler(event, context):
 
