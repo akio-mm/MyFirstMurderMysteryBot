@@ -245,24 +245,25 @@ def handle_message(event):
         # urlの変数が未定義だとエラーが起こるので先に定義
         url_01 = None
         url_02 = None
-
         
         # モデルが関数を呼び出したいかどうかを確認
         if message.get("function_call"):
             function_name = message["function_call"]["name"]
-			arguments = json.loads(message["function_call"]["arguments"])
-  			# ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数              
+            arguments = json.loads(message["function_call"]["arguments"])
+  	        # ユーザーが推理を宣言してもいいか許可を得てきたときに呼ぶ関数              
             if function_name == "update_user_phase_investigation":
                 # ユーザーの現在のフェーズを取得
                 current_phase = lambda_dao.get_user_info(user_id)['CurrentPhase']
-                # 条件に合致するか確認
-                if current_phase == 'investigation':
-                    # フェーズを次の段階に移行
-                    lambda_dao.update_user_phase(user_id, current_phase)
-                    second_response = call_second_gpt(messages)
-                    answer = second_response["choices"][0]["message"]["content"]
+                # ファンクションコーリングの暴発防止
+                if "発表" in query:
+                    # 条件に合致するか確認
+                    if current_phase == 'investigation':
+                        # フェーズを次の段階に移行
+                        lambda_dao.update_user_phase(user_id, current_phase)
+                        second_response = call_second_gpt(messages)
+                        answer = second_response["choices"][0]["message"]["content"]
                     
-                else:  # なんか無理やり違うフェーズなのに呼び出そうとしてエラー起こすから軌道修正
+                else:  #なんか無理やり違うフェーズなのに呼び出そうとしてエラー起こすから軌道修正
                     second_response = call_second_gpt(messages)
                     answer = second_response["choices"][0]["message"]["content"]
 					
@@ -304,9 +305,10 @@ def handle_message(event):
         if url_01 is not None:
             answer_list.append(TextSendMessage(text=f'{url_01}'))
             
-        elif url_02 is not None:
+        if url_02 is not None:
             answer_list.append(TextSendMessage(text='解説'))
             answer_list.append(TextSendMessage(text=f'{url_02}'))
+            line_bot_api.reply_message(event.reply_token, answer_list[1:])
         
         # introの時の会話履歴は残したくない
         if current_phase != 'intro':
