@@ -307,10 +307,6 @@ def handle_message(event):
         elif url_02 is not None:
             answer_list.append(TextSendMessage(text='解説'))
             answer_list.append(TextSendMessage(text=f'{url_02}'))
-            
-            
-        # answer_listをstrに変換
-        answer_str = ', '.join(map(str, answer_list))
         
         # introの時の会話履歴は残したくない
         if current_phase != 'intro':
