@@ -355,7 +355,7 @@ def call_gpt(messages, functions):
     return openai.ChatCompletion.create(
         model= 'gpt-3.5-turbo-16k-0613',
         temperature=0.05,
-        max_tokens=100,
+        max_tokens=200,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
@@ -369,7 +369,7 @@ def call_second_gpt(messages):
     return openai.ChatCompletion.create(
         model= 'gpt-3.5-turbo-16k-0613',
         temperature=0.05,
-        max_tokens=100,
+        max_tokens=200,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
