@@ -226,7 +226,7 @@ def handle_message(event):
             
         # ChatGPTに質問を投げて回答を取得する
         if current_phase == "reasoning":
-            answer_response = call_gpt_reasoning(messages, functions)
+            answer_response = call_gpt_reasoning(messages)
         else:
             answer_response = call_gpt(messages, functions)
         # answer_responseの中身が無かったらエラーを吐く
@@ -375,7 +375,7 @@ def call_second_gpt(messages):
     )
     
 # gptを呼び出す(正解か不正解化だけが欲しいので。と！で切る)
-def call_gpt_reasoning(messages, functions):
+def call_gpt_reasoning(messages):
     logger.info("About to call GPT-3 API.")
     return openai.ChatCompletion.create(
         model= 'gpt-3.5-turbo-16k-0613',
@@ -386,7 +386,6 @@ def call_gpt_reasoning(messages, functions):
         presence_penalty=0,
         stop=["。", "！"],
         messages= messages,
-        functions= functions,
         function_call="auto"
     )
 
