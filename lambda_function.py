@@ -291,7 +291,7 @@ def handle_message(event):
         #推理フェーズの時にキーワードの数で正解のURLか不正解のURLかに決める
         if current_phase == "reasoning":
             #フェーズをアップデート
-            #lambda_dao.update_user_phase(user_id, current_phase)
+            lambda_dao.update_user_phase(user_id, current_phase)
             answer_list.append(TextSendMessage(text='エンディング'))
             #正解か不正解か判別してURLを変える
             if check_keywords(query, keywords):
