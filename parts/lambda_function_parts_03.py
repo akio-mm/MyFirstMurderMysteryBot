@@ -385,8 +385,7 @@ def call_gpt_reasoning(messages):
         frequency_penalty=0,
         presence_penalty=0,
         stop=["。", "！"],
-        messages= messages,
-        function_call="auto"
+        messages= messages
     )
 
 # LINE Messaging APIからのWebhookを処理する
