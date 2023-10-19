@@ -404,7 +404,7 @@ def get_url_based_on_keyword_place(location_name, url_mapping):
 #推理のキーワードの数をチェック
 def check_keywords(query, keywords):
     count = sum(keyword in query for keyword in keywords)
-    return count >= 4
+    return count >= 5
     
 # LINE Messaging APIからのWebhookを処理する
 def lambda_handler(event, context):
