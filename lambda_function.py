@@ -83,7 +83,7 @@ def handle_message(event):
         questionnaire = (
             'お疲れ様です！ゲームをプレイしていただき、誠にありがとうございます。\n'
             '皆様のご意見は、今後のゲーム改善に非常に役立つ貴重な情報です。もしよろしければ、短いアンケートにご協力いただけますでしょうか。\n'
-            'アンケートURL:(https://example.com/page1)\n'
+            'アンケートURL:(https://forms.gle/XNfCnwE9wciwvuE78)\n'
             'アンケートの内容は今作や次回作の改良に役立たせていただきます\n'
             'どうぞよろしくお願いします。'
             )
@@ -137,7 +137,7 @@ def handle_message(event):
         # タイムリミットに基づく通知やフェーズの変更
         time_limit_notification = ""
         if limit == 15:
-            time_limit_notification = "もう時間も半分が過ぎたけど原稿は見つかりそうかな？"
+            time_limit_notification = "もう時間も半分が過ぎたけど調子はどうかな？"
         elif limit == 25:
             time_limit_notification = "あと少ししか時間は残っていない。後10分程度だ。もうすぐ家を出る準備を始めようと思うから急いでくれ。"
         elif limit == 30:
@@ -152,7 +152,7 @@ def handle_message(event):
         # 過去の会話履歴を保存
         get_talk = lambda_dao.get_talk_history(user_id)
         past_conversations = get_past_conversations(get_talk)
-
+        
         # フェーズに応じたプロンプトを取得
         current_prompt = lambda_dao.get_prompt_for_phase(current_phase)
         
@@ -227,7 +227,7 @@ def handle_message(event):
             
         # ChatGPTに質問を投げて回答を取得する
         if current_phase == "reasoning":
-            answer_response = call_gpt_reasoning(messages)
+            answer_response = call_second_gpt(messages)
         else:
             answer_response = call_gpt(messages, functions)
         # answer_responseの中身が無かったらエラーを吐く
@@ -285,21 +285,25 @@ def handle_message(event):
         # GPTからのレスポンス（answer変数）を返信リストに追加
         answer_list.append(TextSendMessage(text=answer))
         
-        # ChatGPTの回答からエンディングの種類を判別してUrlを取得
-        if current_phase == 'reasoning':
-            keywords = ["不正解", "正解"]
-            for keyword in keywords:
-                if keyword in answer:
-                    answer_list.append(TextSendMessage(text='エンディング'))
-                    url_01 = get_url_based_on_keyword(keyword, url_mapping)
-                    lambda_dao.update_user_phase(user_id, current_phase)
-                    # 解説のURLを追加
-                    url_02 = "https://docs.google.com/document/d/10MUbcFgBWeIK18LUYyntIJ6eC-0MOEoLBI6qLAG5YYw/edit?usp=sharing"
-                    if url_01 is None:
-                        logger.warning(f"No URL found for the keyword: {keyword}")
-                    break
+        #推理が正解か不正解か判別するキーワード
+        keywords = ["契約", "破棄", "成田", "さき",  "擦ると消える", "アイロン"]
+        
+        #推理フェーズの時にキーワードの数で正解のURLか不正解のURLかに決める
+        if current_phase == "reasoning":
+            #フェーズをアップデート
+            #lambda_dao.update_user_phase(user_id, current_phase)
+            answer_list.append(TextSendMessage(text='エンディング'))
+            #正解か不正解か判別してURLを変える
+            if check_keywords(query, keywords):
+                #エンディング１
+                url_01 = "https://docs.google.com/document/d/1j23deV8p8PwYVdYBxhHL0id7vxjd1iwOr0GjFkTuGXw/edit?usp=sharing"
+                #解説
+                url_02 = "https://docs.google.com/document/d/10MUbcFgBWeIK18LUYyntIJ6eC-0MOEoLBI6qLAG5YYw/edit?usp=sharing"
             else:
-                logger.info("No matching keywords found in the answer.")
+                #エンディング２
+                url_01 = "https://docs.google.com/document/d/1Xfjb69VUMf9gz63UTd65Rk-qp5INDD_GHJ-DbxCg4eU/edit?usp=sharing"
+                #解説
+                url_02 = "https://docs.google.com/document/d/10MUbcFgBWeIK18LUYyntIJ6eC-0MOEoLBI6qLAG5YYw/edit?usp=sharing"
             
         # 特定のURLが存在する場合、それも返信リストに追加
         if url_01 is not None:
@@ -376,46 +380,32 @@ def call_second_gpt(messages):
         stop=["\n"],
         messages= messages
     )
-    
-# gptを呼び出す(正解か不正解化だけが欲しいので。と！で切る)
-def call_gpt_reasoning(messages):
-    logger.info("About to call GPT-3 API.")
-    return openai.ChatCompletion.create(
-        model= 'gpt-3.5-turbo-16k-0613',
-        temperature=0.05,
-        max_tokens=100,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=["。", "！"],
-        messages= messages
-    )
 
 #Urlをまとめたデータを作成
 url_mapping = {
-    '正解': 'https://example.com/page2',
-    '不正解': 'https://example.com/page4',
-    'リビング': 'https://example.com/page3',
-    '書斎': 'https://example.com/page3',
-    'キッチン': 'https://example.com/page3',
-    'テーブル': 'https://example.com/page3',
-    'テーブルの下': 'https://example.com/page3',
-    'ベランダ': 'https://example.com/page3',
-    'ゴミ箱': 'https://example.com/page3',
-    'クローゼット': 'https://example.com/page3',
-    '仕事机': 'https://example.com/page3',
-    '引き出し': 'https://example.com/page3',
-    'トイレ': 'https://example.com/page3'
+    'リビング': 'https://docs.google.com/document/d/15f_UX1WtwFy12CgMsHcwBBIWp0DMD8ohWu-QUDE1J4A/edit?usp=sharing',
+    '書斎': 'https://docs.google.com/document/d/1Njvoai5L34A8AJRuhgmgznDBuFgvnoWOJOs5apgH0es/edit?usp=sharing',
+    'キッチン': 'https://docs.google.com/document/d/10HO1uwx1EMOzfDpSYCmHInyryay-OekP3al7jp28fn0/edit?usp=sharing',
+    'テーブル': 'https://docs.google.com/document/d/1Vx4AZe6lUX2fsGlYImrj7Ms5p36R4w4cJXfdcnVbQfE/edit?usp=sharing',
+    'テーブルの下': 'https://docs.google.com/document/d/1zaZ61Cwcl5QsVoYlGLG0zzmfK01fyiy9FZOl0C-uhnY/edit?usp=sharing',
+    'ベランダ': 'https://docs.google.com/document/d/1wdtKf0XS7_w0XMDsLBrYtV-edDRTbblhQFtmSuj95IQ/edit?usp=sharing',
+    'ゴミ箱': 'https://docs.google.com/document/d/1S6m8qgAMDNDa_kvNh0f2HFF4OACn1Pf9c0C9hHiEpBk/edit?usp=sharing',
+    'クローゼット': 'https://docs.google.com/document/d/1zjORtkbF2XtV4EbS5_A0nu0foY7bo8Cn7APTe1E4zQ8/edit?usp=sharing',
+    '仕事机': 'https://docs.google.com/document/d/1N2CeDvdrijRYHkjhXtXqfk2KCdylYNH3-kGOhzbytvk/edit?usp=sharing',
+    '引き出し': 'https://docs.google.com/document/d/1_Qwj_RovS5grrqg-OPBxrOUI5i-PI2cg-8tqEiXEDdc/edit?usp=sharing',
+    'トイレ': 'https://docs.google.com/document/d/1tLDczy1QTuyCRpvthdSttpEQ4hcwBf0d-DtsHAJYIr4/edit?usp=sharing'
 }
 
 #特定のキーワードをもとにUrlを取得（場所）
 def get_url_based_on_keyword_place(location_name, url_mapping):
     return url_mapping.get(location_name)
+    
 
-#特定のキーワードをもとにUrlを取得（エンディング）
-def get_url_based_on_keyword(ending, url_mapping):
-    return url_mapping.get(ending)
-
+#推理のキーワードの数をチェック
+def check_keywords(query, keywords):
+    count = sum(keyword in query for keyword in keywords)
+    return count >= 4
+    
 # LINE Messaging APIからのWebhookを処理する
 def lambda_handler(event, context):
 
@@ -445,4 +435,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps('Hello from Lambda!')
     }
-    
