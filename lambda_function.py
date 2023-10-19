@@ -226,7 +226,7 @@ def handle_message(event):
         ]
             
         # ChatGPTに質問を投げて回答を取得する
-        if current_phase == "reasoning":
+        if current_phase != "investigation":
             answer_response = call_second_gpt(messages)
         else:
             answer_response = call_gpt(messages, functions)
