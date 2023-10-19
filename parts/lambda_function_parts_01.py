@@ -226,7 +226,7 @@ def handle_message(event):
             
         # ChatGPTに質問を投げて回答を取得する
         if current_phase == "reasoning":
-            answer_response = call_gpt_reasoning(messages, functions)
+            answer_response = call_gpt_reasoning(messages)
         else:
             answer_response = call_gpt(messages, functions)
         # answer_responseの中身が無かったらエラーを吐く
